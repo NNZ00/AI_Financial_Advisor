@@ -1,9 +1,4 @@
-"""Researcher agent — a ReAct agent that gathers market context using real tools.
-
-Built with LangChain's `create_agent`. It interleaves reasoning with tool calls
-until it has enough to write a brief. Because it's a compiled graph, this one
-node is internally a graph of its own.
-"""
+"""Researcher agent is a ReAct agent that gathers market context using real tools."""
 from datetime import date
 
 from langchain.agents import create_agent
@@ -18,10 +13,6 @@ from financial_advisor.agents_system_prompts import RESEARCHER_SYSTEM_PROMPT
 
 from langgraph.errors import GraphRecursionError
 
-# Hard cap on the Researcher's ReAct loop. Normal research runs 3-6 tool rounds;
-# LangGraph's default of 25 super-steps is loose enough that we once watched a
-# re-grounding pass make 12 calls. 16 super-steps (~7 rounds) leaves legitimate
-# research room while firmly stopping a runaway. Tunable.
 RESEARCH_RECURSION_LIMIT = 16
 
 _research_agent = create_agent(
@@ -64,7 +55,6 @@ def researcher_node(state: AgentState) -> dict:
         brief = result["messages"][-1].content
         tool_calls = sum(1 for m in result["messages"] if m.type == "tool")
     except GraphRecursionError:
-        # Fail safe: hand the Strategist a flagged partial brief instead of crashing.
         degraded = True
         tool_calls = 0
         brief = (
