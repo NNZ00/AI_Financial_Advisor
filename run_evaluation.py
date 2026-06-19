@@ -1,8 +1,8 @@
-"""Stage 6 — run the evaluation suite and log experiments to LangSmith.
-
-    python run_eval.py              # full scorecard over the dataset
-    python run_eval.py consistency  # the 'one fund' case x5, to measure stability
+""" 
+python run_eval.py              # full scorecard over the dataset
+python run_eval.py consistency  # the 'one fund' case x5, to measure stability
 """
+
 import sys
 
 from langsmith import Client, evaluate
