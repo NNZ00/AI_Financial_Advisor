@@ -1,11 +1,5 @@
-"""Critic / Risk agent — an independent reviewer of the Strategist's allocation.
+"""Critic / Risk agent — an independent reviewer of the Strategist's allocation."""
 
-The reflection half of the reflect-and-refine loop (Huang et al., 2024). It judges
-allocations with fresh eyes, approves or returns actionable critique, and — new here
-— signals whether fixing its critique needs NEW external information, so the
-supervisor can route the revision through the Researcher for targeted re-grounding.
-Runs on the flagship at temperature 0.
-"""
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
@@ -34,7 +28,6 @@ def critic_node(state: AgentState) -> dict:
     critique = verdict.critique
     needs_research = verdict.needs_research and not verdict.approved
 
-    # Bright-line: honor an explicit minimum holding count the LLM review can miss.
     min_holdings = getattr(profile, "min_holdings", 0) or 0
     if min_holdings and len(allocation.holdings) < min_holdings:
         approved = False
