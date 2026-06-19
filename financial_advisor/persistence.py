@@ -1,12 +1,5 @@
-"""Persistence — a SQLite checkpointer wired for our state's custom types.
+"""SQLite checkpointer for persistence of runs acreoss sessions."""
 
-LangGraph checkpoints the entire graph state at every super-step. Our state holds
-custom Pydantic models (InvestorProfile, Allocation, Holding). The serializer will
-reconstruct them today, but a future LangGraph version will REFUSE to deserialize
-unregistered types unless we declare them safe. We register them once, here, so the
-runner (main.py) and the inspector (inspect_run.py) share an identical, future-proof
-serializer. Swapping SqliteSaver for PostgresSaver later changes only this file.
-"""
 import sqlite3
 
 from langgraph.checkpoint.sqlite import SqliteSaver
