@@ -1,15 +1,5 @@
-"""Reporter agent — turns the decided strategy into a clear, honest proposal.
+"""Reporter agent turns the decided strategy into a clear, honest proposal."""
 
-The system's communication node. Unlike the Profiler and Strategist it produces
-FREE TEXT, not structured output, because the deliverable is prose for a human.
-Its one job is faithful translation: report what the Strategist decided in plain
-language and — critically — carry the suitability note's honesty through to the
-user rather than softening it. Runs on the cheap workhorse.
-
-STAGE 7 hardening: if the write-up model fails, we DON'T abort (the allocation is
-already built and approved) — we render a plain proposal directly from the
-structured Allocation, preserving the suitability note and the disclaimer.
-"""
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from financial_advisor.config import workhorse_llm
@@ -53,7 +43,7 @@ def _render_fallback_proposal(allocation) -> str:
     """
     lines = ["Investment Proposal", ""]
 
-    if allocation.suitability_note:               # lead with the honest note
+    if allocation.suitability_note:              
         lines += [allocation.suitability_note, ""]
 
     lines.append("Proposed allocation:")
@@ -89,8 +79,6 @@ def reporter_node(state: AgentState) -> dict:
             "messages": [AIMessage(content=f"[Reporter] wrote the final proposal ({len(proposal)} chars).")],
         }
     except Exception as exc:
-        # Write-up model failed, but the allocation is already built and approved —
-        # render it deterministically rather than throwing the run away.
         proposal = _render_fallback_proposal(allocation)
         return {
             "final_proposal": proposal,
