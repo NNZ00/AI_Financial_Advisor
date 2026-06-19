@@ -1,16 +1,5 @@
-"""Shared state for the trading-agent graph.
+"""Shared state for the trading-agent graph."""
 
-AgentState is the "blackboard" every node reads from and writes to. Each
-specialist agent fills in its own slice; the supervisor reads the state to
-decide which agent runs next.
-
-Field lifecycle by stage:
-  - Stage 2 (walking skeleton): the core fields are written by the four stub
-    agents as the graph runs end-to-end. No extra fields needed.
-  - Stage 4 (reflection loop + Critic/Risk agent): `critique` and
-    `revision_count` drive the deliberation loop. Declared now so the contract
-    is explicit, but they stay empty until Stage 4.
-"""
 from typing import Annotated, TypedDict
 
 from langchain_core.messages import AnyMessage
@@ -69,29 +58,17 @@ class CriticVerdict(BaseModel):
 class AgentState(TypedDict):
     """The graph's shared state — the contract all agents collaborate through."""
 
-    # --- Core (written across Stages 2-3) ---
-
     # The original, raw request from the user.
     user_request: str
-
-    # Running log of messages. `add_messages` is a *reducer*: returned messages
-    # are APPENDED to this list instead of replacing it, so every agent can
-    # post to one shared trace.
     messages: Annotated[list[AnyMessage], add_messages]
-
-    # Each slice below has a single writer, so the default behaviour (a node's
-    # return value OVERWRITES the field) is exactly what we want.
     investor_profile: InvestorProfile   # written by the Profiler
-    research_findings: dict             # written by the Researcher (firmed up in Stage 3)
-    proposed_allocation: Allocation     # written by the Strategist (firmed up in Stage 3)
+    research_findings: dict             # written by the Researcher 
+    proposed_allocation: Allocation     # written by the Strategist
     final_proposal: str                 # written by the Reporter
 
     # The Supervisor writes its routing decision here: the name of the next
     # node to run, or "FINISH" when the proposal is complete.
     next_node: str
-
-    # --- Reflection loop (Stage 4 — Critic/Risk agent) ---
-    # Declared now so the contract is explicit; unused until Stage 4.
 
     # The Critic/Risk agent's feedback on the proposed allocation. When it's
     # non-empty and not yet resolved, the Supervisor routes back to the
@@ -108,8 +85,5 @@ class AgentState(TypedDict):
     # whenever it writes a new allocation, so every allocation gets re-reviewed.
     critic_approved: bool
 
-    # Set True by the Critic when fixing its critique needs NEW external info
-    # (verifying a newly suggested instrument, finding an alternative). The
-    # supervisor then routes the revision through the Researcher for targeted
-    # re-grounding before the Strategist revises; the Researcher clears it.
+    # Set True by the Critic when fixing its critique needs NEW external info.
     needs_research: bool
