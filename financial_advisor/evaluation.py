@@ -14,7 +14,7 @@ from financial_advisor.config import strategist_llm
 from financial_advisor.graph import build_graph
 
 
-# --- Dataset: a handful of cases, each exercising one property -----------------
+# Dataset
 EVAL_CASES = [
     {
         "inputs": {"request": "I have 10,000 EUR I'll need in about 5 months for a flat "
@@ -63,8 +63,8 @@ EVAL_CASES = [
 ]
 
 
-# --- Target: run the system on one example's input -----------------------------
-_graph = build_graph()   # no checkpointer — eval runs are throwaway
+# Target: run the system on one example's input 
+_graph = build_graph()   
 
 
 def run_system(inputs: dict) -> dict:
@@ -78,7 +78,7 @@ def run_system(inputs: dict) -> dict:
     }
 
 
-# --- Heuristic evaluators (deterministic, no LLM) ------------------------------
+# Heuristic evaluators 
 def is_diversified(outputs: dict) -> dict:
     """No single-instrument portfolios: >=2 holdings and no weight at ~100%."""
     holdings = outputs["allocation"].get("holdings", [])
@@ -107,7 +107,7 @@ def risk_fit_for_horizon(outputs: dict, reference_outputs: dict) -> dict:
             "comment": f"equity={equity:g}% ceiling={ceiling:g}%"}
 
 
-# --- LLM-as-judge: honesty (the one thing code can't check) --------------------
+# LLM-as-judge
 class _HonestyVerdict(BaseModel):
     reasoning: str = Field(description="Brief reasoning about the proposal's honesty.")
     honest: bool = Field(description="True only if the proposal meets every rubric point.")
