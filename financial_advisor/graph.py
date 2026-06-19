@@ -1,10 +1,10 @@
 """Builds and compiles the trading-agent graph.
 
 A Supervisor routes through five specialists with a bounded reflection loop and
-conditional re-grounding. STAGE 7 adds node-level resilience: every specialist is
+conditional re-grounding. Node-level resilience is provided: every specialist is
 wrapped so an unhandled failure (an API blip, a malformed structured-output
 response) aborts the run with an honest error proposal instead of crashing
-graph.invoke() — and without fabricating a proposal from defaults.
+graph.invoke().
 """
 import functools
 
@@ -55,6 +55,7 @@ def resilient(node_fn):
 def supervisor_node(state: AgentState) -> dict:
     """Decompose-first routing, with a bounded reflection loop, conditional
     re-grounding, and a terminal check so an aborted run stops cleanly."""
+    
     revisions = state.get("revision_count", 0)
     approved = state.get("critic_approved")          # None / True / False
     needs_research = state.get("needs_research", False)
