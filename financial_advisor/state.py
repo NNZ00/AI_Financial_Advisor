@@ -38,8 +38,7 @@ class Allocation(BaseModel):
     """The Strategist's proposed portfolio.
 
     `reasoning` is listed FIRST on purpose: the model fills fields in schema order,
-    so reasoning-first forces it to think before it allocates — chain-of-thought
-    baked into the structure.
+    so reasoning-first forces chain-of-thought mechanism
     """
     reasoning: str = Field(description="Step-by-step reasoning: from horizon and risk capacity, to asset-class mix, to specific instruments and weights. Think here before deciding holdings.")
     holdings: list[Holding] = Field(description="The portfolio. Weights must sum to 100.")
@@ -56,8 +55,8 @@ class CriticVerdict(BaseModel):
 
     
 class AgentState(TypedDict):
-    """The graph's shared state — the contract all agents collaborate through."""
-
+    """Shared state"""
+    
     # The original, raw request from the user.
     user_request: str
     messages: Annotated[list[AnyMessage], add_messages]
