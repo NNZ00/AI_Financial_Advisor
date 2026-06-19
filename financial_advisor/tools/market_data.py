@@ -1,9 +1,7 @@
-"""Market-data tool (yfinance) for the Researcher agent.
+"""
+Market-data tool (yfinance) for the Researcher agent.
 
-Resolves a ticker robustly across exchanges, and — important for hardening — it
-NEVER raises: any failure (bad symbol, network blip, data-service error, thin
-history) comes back as a clean, informative string the ReAct agent can reason
-around, rather than an exception that could crash the research node.
+Resolves a ticker robustly across exchanges. Hardened to handle unavailability.
 """
 import logging
 
@@ -40,13 +38,8 @@ def _resolve_history(ticker: str):
 
 @tool
 def get_market_data(ticker: str) -> str:
-    """Fetch recent market data for a stock or ETF ticker.
-
-    Accepts US symbols (e.g. 'VOO', 'AGG', 'VT') and European UCITS ETFs
-    (e.g. 'VWCE', 'EUNL') — for the latter the tool automatically finds the right
-    Yahoo exchange listing. Returns the latest price, the trailing 1-year total
-    return, and the annualized volatility.
-    """
+    """Fetch recent market data for a stock or ETF ticker."""
+    
     try:
         symbol, history = _resolve_history(ticker)
         if history is None:
