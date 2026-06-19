@@ -1,11 +1,5 @@
-"""Read a persisted run back from the checkpoint DB — in a fresh process.
+"""Read a persisted run back from the checkpoint DB."""
 
-This is the point of Stage 5: a past run's full state (profile, allocation, final
-proposal, message trace) outlives the process that produced it. Pass the thread_id
-that main.py printed.
-
-    python inspect_run.py <thread_id>
-"""
 import sys
 
 from financial_advisor.graph import build_graph
