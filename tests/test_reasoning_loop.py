@@ -1,10 +1,5 @@
-"""Force the full reflection + re-grounding cycle, deterministically.
+"""Force the full reflection + re-grounding cycle, deterministically."""
 
-The loop is a safety net — a well-tuned system rarely trips it, which is exactly why
-it went quiet once the search improved. To TEST it, we seed the graph with a 100%
-concentrated allocation so the sharpened Critic is guaranteed to reject it, and watch
-the cycle run: critique -> (re-ground) -> revise -> approve.
-"""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
