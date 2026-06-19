@@ -1,4 +1,4 @@
-"""Critic / Risk agent — an independent reviewer of the Strategist's allocation."""
+"""Critic is an independent reviewer of the Strategist's allocation."""
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
