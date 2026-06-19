@@ -1,8 +1,8 @@
-"""Web-search tool (Tavily) for the Researcher agent.
+"""
+Web-search tool (Tavily) for the Researcher agent.
 
-Wraps Tavily in a minimal tool exposing only `query` (so the model can't pass
-invalid or over-restrictive params), and — for hardening — it NEVER raises: a
-search failure comes back as a clean observation the agent can reason around.
+Wraps Tavily in a minimal tool exposing only `query` (so the model can't pass invalid or over-restrictive params). 
+When search failure happens, it comes back as a clean observation the agent can reason around.
 """
 from langchain_core.tools import tool
 from langchain_tavily import TavilySearch
