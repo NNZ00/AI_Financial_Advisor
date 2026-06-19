@@ -1,11 +1,5 @@
-"""Strategist agent — turns the profile + research into a concrete allocation.
+"""Strategist agent turns the profile informations and the research brief into a concrete allocation."""
 
-This is the system's chain-of-thought node (Wei et al., 2022). It runs on the
-FLAGSHIP model at a higher temperature, because this is the judgment-heavy,
-generative step where the stronger model earns its cost. A reasoning-first schema
-makes the model reason before it allocates, and we normalize the weights
-afterwards rather than trusting the model's arithmetic.
-"""
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from financial_advisor.config import strategist_llm
@@ -44,6 +38,6 @@ def strategist_node(state: AgentState) -> dict:
     summary = ", ".join(f"{h.ticker or h.asset_class} {h.weight_pct:g}%" for h in allocation.holdings)
     return {
         "proposed_allocation": allocation,
-        "critic_approved": None,   # new allocation → not yet reviewed; force the Critic to re-check
+        "critic_approved": None,   
         "messages": [AIMessage(content=f"[Strategist] {summary}")],
     }
