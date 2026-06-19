@@ -1,4 +1,3 @@
-"""Stage 0 sanity check: verify env vars load, the LLM answers, and data flows."""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
