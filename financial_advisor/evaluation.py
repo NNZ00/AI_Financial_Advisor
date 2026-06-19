@@ -1,12 +1,11 @@
-"""Stage 6 — evaluation suite for the trading-agent system.
+"""Evaluation suite for the trading-agent system.
 
-Defines a small, curated dataset of investor requests, a set of evaluators that
+Contains a dataset of investor requests, a set of evaluators that
 score each run, and a target that runs the graph. Heuristic evaluators are plain
 deterministic functions; one LLM-as-judge covers honesty, which code can't check.
 
 Per-case expectations live in each example's `outputs` (they arrive in evaluators
-as `reference_outputs`): a horizon-based equity ceiling and a refusal flag. There
-is no "correct" allocation to match against — we score PROPERTIES of the output.
+as `reference_outputs`).
 """
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
