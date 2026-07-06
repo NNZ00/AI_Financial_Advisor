@@ -155,6 +155,21 @@ python inspect_run.py <thread_id>     # replay a past run from the checkpoint DB
 
 Beyond the CLI, the same multi-agent system is exposed over HTTP by a small **FastAPI** layer with a **self-contained web UI** — no build step, just plain HTML/CSS/JS served by the API. Type a request in the browser and the result is laid out in tabs (allocation, risk & suitability, profile, full report), with a live timer while the agents work.
 
+<p align="center">
+  <img src="docs/ui-request.png" width="820" alt="The request box — describe your capital, horizon and risk appetite"><br>
+  <sub><em>The request box — describe your mandate; the agents then deliberate for 1–3 minutes.</em></sub>
+</p>
+
+<p align="center">
+  <img src="docs/ui-allocation.png" width="820" alt="Allocation view — KPIs, allocation donut and weighted holdings with rationale"><br>
+  <sub><em>Allocation view — KPIs, an allocation donut, and each holding with its rationale.</em></sub>
+</p>
+
+<p align="center">
+  <img src="docs/ui-report.png" width="820" alt="Full report view — the written investment proposal"><br>
+  <sub><em>Full report — the written proposal, one of four tabbed views.</em></sub>
+</p>
+
 ```bash
 pip install -r requirements.txt -r requirements-api.txt
 uvicorn api:app --reload        # then open http://127.0.0.1:8000/
