@@ -151,6 +151,21 @@ python inspect_run.py <thread_id>     # replay a past run from the checkpoint DB
 
 ---
 
+## 🌐 Web app & HTTP API
+
+Beyond the CLI, the same multi-agent system is exposed over HTTP by a small **FastAPI** layer with a **self-contained web UI** — no build step, just plain HTML/CSS/JS served by the API. Type a request in the browser and the result is laid out in tabs (allocation, risk & suitability, profile, full report), with a live timer while the agents work.
+
+```bash
+pip install -r requirements.txt -r requirements-api.txt
+uvicorn api:app --reload        # then open http://127.0.0.1:8000/
+```
+
+- **Endpoints:** `POST /advise`, `GET /runs/{thread_id}`, `GET /health` — interactive docs at `/docs`.
+- **Optional password:** set `APP_PASSWORD` to gate the whole app behind HTTP Basic Auth.
+- Full usage in **[`API_README.md`](API_README.md)**; exposing it publicly over a tunnel is covered in **[`GO_PUBLIC.md`](GO_PUBLIC.md)**.
+
+---
+
 ## 🔧 Design decisions 
 
 - **Temperature** `0.0` for extraction and review (deterministic), `0.3` for the generative steps (Strategist, Reporter). 
