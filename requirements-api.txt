@@ -1,0 +1,4 @@
+# Extra dependencies for the HTTP API + web UI, on top of requirements.txt.
+# Install both:  pip install -r requirements.txt -r requirements-api.txt
+fastapi==0.139.0
+uvicorn[standard]==0.49.0

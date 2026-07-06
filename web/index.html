@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aurum · AI Financial Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root{
+    --bg0:#060b14; --bg1:#0a1322;
+    --card:rgba(150,178,216,.055); --card-solid:#0d1728; --line:rgba(150,178,216,.14);
+    --ink:#eaf1fb; --muted:#8ea3c2;
+    --muted2:#6f83a3;
+    --accent:#35d6a4; --accent-2:#e7b568; --accent-3:#4ea9ff;
+    --pos:#35d6a4; --neg:#ff6b7d;
+    --hole:#0c1526;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:16px;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1100px 620px at 82% -8%, rgba(53,214,164,.14), transparent 60%),
+      radial-gradient(900px 560px at 8% 4%, rgba(231,181,104,.10), transparent 55%),
+      radial-gradient(1200px 800px at 50% 120%, rgba(78,169,255,.10), transparent 60%),
+      linear-gradient(180deg, var(--bg1), var(--bg0));
+    background-attachment:fixed; min-height:100vh;
+  }
+  a{color:var(--accent)}
+  .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+
+  /* top bar */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    max-width:1060px; margin:0 auto; padding:20px 22px;
+  }
+  .brand{display:flex; align-items:center; gap:12px}
+  .mark{
+    width:40px; height:40px; border-radius:11px; flex:none;
+    background:linear-gradient(150deg,#123227,#0c1c2e); border:1px solid var(--line);
+    display:grid; place-items:center; box-shadow:inset 0 0 22px rgba(53,214,164,.18);
+  }
+  .brand .name{font-family:"Fraunces",serif; font-weight:600; font-size:1.24rem; letter-spacing:.2px}
+  .brand .name span{color:var(--accent-2)}
+  .brand .sub{color:var(--muted); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase}
+  .pill{
+    font-size:.72rem; color:var(--muted); border:1px solid var(--line);
+    padding:6px 12px; border-radius:999px; display:flex; align-items:center; gap:7px; white-space:nowrap;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  .wrap{max-width:1060px; margin:0 auto; padding:8px 22px 90px}
+
+  /* hero */
+  .hero{padding:26px 4px 10px; position:relative}
+  .hero h1{
+    font-family:"Fraunces",serif; font-weight:600; font-size:clamp(1.9rem,4vw,2.9rem);
+    line-height:1.08; margin:0 0 10px; letter-spacing:-.5px;
+  }
+  .hero h1 em{font-style:italic; color:var(--accent)}
+  .hero p{color:var(--muted); max-width:60ch; margin:0 0 4px; font-size:1.02rem}
+  .agents{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px}
+  .agents .tag{
+    font-size:.74rem; color:var(--muted); border:1px solid var(--line); border-radius:8px;
+    padding:5px 10px; background:rgba(255,255,255,.02); display:flex; gap:7px; align-items:center;
+  }
+  .agents .tag b{color:var(--ink); font-weight:600}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px; margin-bottom:20px; backdrop-filter:blur(8px);
+  }
+  .card.pad{padding:24px}
+  label{font-weight:600; font-size:.92rem; display:block; margin-bottom:9px}
+  textarea{
+    width:100%; min-height:130px; resize:vertical; padding:14px 15px;
+    border:1px solid var(--line); border-radius:12px; background:rgba(4,10,20,.55);
+    color:var(--ink); font:inherit; font-size:.98rem;
+  }
+  textarea::placeholder{color:var(--muted2)}
+  textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(53,214,164,.16)}
+  .examples{display:flex; flex-wrap:wrap; gap:8px; margin:13px 0 2px}
+  .chip{
+    border:1px solid var(--line); background:transparent; color:var(--muted);
+    font-size:.79rem; padding:7px 12px; border-radius:999px; cursor:pointer; transition:.15s; font-family:inherit;
+  }
+  .chip:hover{border-color:var(--accent); color:var(--accent); background:rgba(53,214,164,.06)}
+  .row{display:flex; align-items:center; gap:16px; margin-top:18px; flex-wrap:wrap}
+  button.primary{
+    background:linear-gradient(135deg,#3ee0ad,#12b487); color:#04241a; border:none; border-radius:12px;
+    padding:13px 26px; font-size:1rem; font-weight:700; cursor:pointer; transition:.18s;
+    box-shadow:0 8px 22px rgba(53,214,164,.28); display:flex; align-items:center; gap:9px; font-family:inherit;
+  }
+  button.primary:hover{transform:translateY(-1px); box-shadow:0 12px 28px rgba(53,214,164,.36)}
+  button.primary:disabled{opacity:.5; cursor:not-allowed; transform:none; box-shadow:none}
+  .hint{color:var(--muted); font-size:.86rem}
+
+  .loading{display:none; align-items:center; gap:13px}
+  .loading.on{display:flex}
+  .spinner{width:20px;height:20px;border:3px solid rgba(150,178,216,.25);border-top-color:var(--accent);border-radius:50%;animation:spin .85s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .alert{border-radius:12px; padding:13px 15px; font-size:.92rem; margin-bottom:18px; display:flex; gap:10px; align-items:flex-start}
+  .alert.err{background:rgba(255,107,125,.1); color:#ffb3bc; border:1px solid rgba(255,107,125,.4)}
+  .alert.warn{background:rgba(231,181,104,.1); color:#f0cf9a; border:1px solid rgba(231,181,104,.4)}
+
+  #results{display:none; animation:rise .4s ease}
+  #results.on{display:block}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+
+  /* section selector (tabs) */
+  .tabs{display:flex; gap:6px; margin-bottom:18px; padding:5px; background:var(--card); border:1px solid var(--line);
+        border-radius:13px; backdrop-filter:blur(8px); overflow-x:auto; scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:1 0 auto; white-space:nowrap; border:none; background:transparent; color:var(--muted);
+       font:inherit; font-weight:600; font-size:.88rem; padding:10px 16px; border-radius:9px; cursor:pointer;
+       transition:.15s; display:flex; align-items:center; justify-content:center; gap:8px}
+  .tab[hidden]{display:none}
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:linear-gradient(135deg,rgba(53,214,164,.18),rgba(53,214,164,.06)); color:var(--ink);
+              box-shadow:inset 0 0 0 1px rgba(53,214,164,.32)}
+  .tab .ic{color:var(--accent)}
+  .tab .count{font-family:var(--mono); font-size:.72rem; color:var(--muted); background:rgba(255,255,255,.05);
+              padding:1px 7px; border-radius:999px; min-width:20px}
+  .tab.active .count{color:var(--accent)}
+  .panel{display:none}
+  .panel.active{display:block; animation:rise .32s ease}
+  .panel-head{font-family:"Fraunces",serif; font-size:1.15rem; font-weight:600; margin:0 0 15px; color:var(--ink)}
+
+  /* KPI cards */
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:20px}
+  .kpi{
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px;
+    position:relative; overflow:hidden; backdrop-filter:blur(8px);
+  }
+  .kpi::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--kc,var(--accent))}
+  .kpi .k{color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.08em}
+  .kpi .v{font-family:"Fraunces",serif; font-weight:600; font-size:1.7rem; margin-top:6px; line-height:1}
+  .kpi .v small{font-size:.9rem; color:var(--muted); font-family:"Inter"; font-weight:500}
+
+  /* profile grid */
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px}
+  .kv{background:rgba(4,10,20,.4); border:1px solid var(--line); border-radius:11px; padding:11px 13px}
+  .kv .k{color:var(--muted); font-size:.7rem; text-transform:uppercase; letter-spacing:.05em}
+  .kv .v{font-weight:600; margin-top:3px; word-break:break-word; font-size:.95rem}
+
+  /* allocation */
+  .alloc-top{display:flex; gap:30px; align-items:center; flex-wrap:wrap}
+  .donut-wrap{position:relative; width:190px; height:190px; flex:none}
+  .donut{width:190px; height:190px; border-radius:50%; position:relative;
+         filter:drop-shadow(0 6px 18px rgba(0,0,0,.4))}
+  .donut::after{content:""; position:absolute; inset:30px; border-radius:50%; background:var(--hole);
+         border:1px solid var(--line)}
+  .donut-center{position:absolute; inset:0; display:grid; place-items:center; text-align:center; pointer-events:none}
+  .donut-center .big{font-family:"Fraunces",serif; font-size:1.5rem; font-weight:600; line-height:1}
+  .donut-center .lab{color:var(--muted); font-size:.66rem; text-transform:uppercase; letter-spacing:.09em; margin-top:3px}
+  .legend{flex:1 1 260px; min-width:240px}
+  .legrow{display:flex; align-items:center; gap:11px; margin-bottom:9px; font-size:.9rem}
+  .swatch{width:11px; height:11px; border-radius:3px; flex:none; box-shadow:0 0 8px rgba(0,0,0,.3)}
+  .legrow .name{flex:1; color:var(--ink)}
+  .legrow .pct{font-family:var(--mono); font-weight:600}
+
+  table{width:100%; border-collapse:collapse; margin-top:22px; font-size:.9rem}
+  th,td{text-align:left; padding:12px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{color:var(--muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; font-weight:600}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  td .wpct{font-family:var(--mono); font-weight:600; font-size:.98rem}
+  td .bar{height:6px; border-radius:4px; margin-top:7px; background:var(--accent)}
+  td .tick{font-family:var(--mono); color:var(--accent-3)}
+  td .rat{color:var(--muted); font-size:.84rem; margin-top:7px; line-height:1.5}
+
+  .note{border-left:3px solid var(--accent); padding:6px 0 6px 15px; margin:10px 0; color:var(--ink); font-size:.94rem}
+  .note.gold{border-color:var(--accent-2)}
+  .note b{color:var(--accent)}
+  .note.gold b{color:var(--accent-2)}
+
+  .proposal{line-height:1.72; font-size:.98rem}
+  .proposal h1,.proposal h2,.proposal h3{font-family:"Fraunces",serif; line-height:1.25; margin-top:1.4em}
+  .proposal strong{color:var(--ink)}
+  .proposal hr{border:none; border-top:1px solid var(--line); margin:20px 0}
+  .proposal code{background:rgba(4,10,20,.6); padding:2px 6px; border-radius:6px; font-family:var(--mono); font-size:.85em}
+  .proposal ul{padding-left:1.2em}
+
+  .meta{color:var(--muted); font-size:.8rem; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); display:flex; gap:16px; flex-wrap:wrap}
+  .meta .num{color:var(--ink)}
+  footer{max-width:1060px; margin:0 auto; padding:0 22px 40px; color:var(--muted2); font-size:.78rem; text-align:center}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 17.5L9 11l4 3.5L21 6" stroke="#35d6a4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15 6h6v6" stroke="#e7b568" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="name">Aurum<span>.</span> <span style="color:var(--muted);font-weight:500;font-size:.9rem">Advisor</span></div>
+        <div class="sub">AI portfolio desk</div>
+      </div>
+    </div>
+    <div class="pill"><span class="dot"></span> 5 agents · live</div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <h1>Institutional-grade portfolios,<br><em>built by a team of AI agents.</em></h1>
+      <p>Describe your capital, horizon and risk appetite. A profiler, researcher, strategist, risk critic and reporter deliberate and return a diversified, honestly-reasoned proposal.</p>
+      <div class="agents">
+        <span class="tag"><b>1</b> Profiler</span>
+        <span class="tag"><b>2</b> Researcher</span>
+        <span class="tag"><b>3</b> Strategist</span>
+        <span class="tag"><b>4</b> Risk critic</span>
+        <span class="tag"><b>5</b> Reporter</span>
+      </div>
+    </div>
+
+    <section class="card pad">
+      <label for="req">Your mandate</label>
+      <textarea id="req" placeholder="e.g. I have 20,000 EUR to invest for retirement in ~30 years. I'm comfortable with volatility and want long-term growth."></textarea>
+      <div class="examples" id="examples"></div>
+      <div class="row">
+        <button class="primary" id="go">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#04241a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Generate proposal
+        </button>
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <span id="loadingText">The desk is deliberating… this usually takes 1–3 minutes.</span>
+        </div>
+        <span class="hint" id="idleHint">Runs the full multi-agent analysis · Ctrl+Enter to submit</span>
+      </div>
+    </section>
+
+    <div id="alert"></div>
+
+    <div id="results">
+      <div class="kpis" id="kpis"></div>
+
+      <div class="tabs" id="tabs" role="tablist">
+        <button class="tab active" data-tab="alloc" type="button"><span class="ic">◑</span> Allocation <span class="count" id="allocCount"></span></button>
+        <button class="tab" data-tab="risk" type="button"><span class="ic">⚖</span> Risk &amp; suitability</button>
+        <button class="tab" data-tab="profile" type="button"><span class="ic">◈</span> Profile</button>
+        <button class="tab" data-tab="report" type="button"><span class="ic">▤</span> Full report</button>
+      </div>
+
+      <section class="card panel active" id="panel-alloc">
+        <div class="panel-head">Proposed allocation</div>
+        <div class="alloc-top">
+          <div class="donut-wrap">
+            <div class="donut" id="donut"></div>
+            <div class="donut-center" id="donutCenter"></div>
+          </div>
+          <div class="legend" id="legend"></div>
+        </div>
+        <table id="allocTable">
+          <thead>
+            <tr><th>Asset</th><th>Ticker</th><th>Class</th><th style="width:40%">Weight &amp; rationale</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="card panel" id="panel-risk">
+        <div class="panel-head">Risk &amp; suitability</div>
+        <div id="riskBody"></div>
+      </section>
+
+      <section class="card panel" id="panel-profile">
+        <div class="panel-head">Investor profile</div>
+        <div class="grid" id="profileGrid"></div>
+      </section>
+
+      <section class="card panel" id="panel-report">
+        <div class="panel-head">Full report</div>
+        <div class="proposal" id="proposal"></div>
+        <div class="meta" id="meta"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer>Educational illustration generated by an automated system — not personalized financial advice.</footer>
+
+<script>
+const EXAMPLES = [
+  "I have 20,000 EUR to invest for retirement in ~30 years. I'm comfortable with ups and downs and want long-term growth.",
+  "I have 10,000 EUR I'll need in about 5 months for a flat deposit. Capital safety is my top priority and I must access it instantly.",
+  "I have 15,000 EUR I'd like to grow over roughly 5 years with a moderate level of risk. Diversify across a handful of low-cost funds.",
+  "I have 1,000 EUR and want to turn it into 5,000 EUR within 2 months. How should I invest it?"
+];
+const COLORS = ["#35d6a4","#e7b568","#4ea9ff","#a78bfa","#f472b6","#22d3ee","#fbbf24","#4ade80","#f9736b","#818cf8"];
+const ABORT_MARKER = "hit a temporary error while building your proposal";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => (s ?? "").toString().replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const classOf = (c) => (c||"").toLowerCase();
+const isEquity = (c) => ["equit","stock","share"].some(k => classOf(c).includes(k));
+const isBond   = (c) => ["bond","fixed","treasur","gilt"].some(k => classOf(c).includes(k));
+
+const exWrap = $("examples");
+EXAMPLES.forEach(t => {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = t.length > 58 ? t.slice(0, 56) + "…" : t;
+  b.title = t;
+  b.onclick = () => { $("req").value = t; $("req").focus(); };
+  exWrap.appendChild(b);
+});
+
+function renderMarkdown(md){
+  if (window.marked && typeof window.marked.parse === "function") return window.marked.parse(md);
+  return "<p>" + esc(md).replace(/\n{2,}/g,"</p><p>").replace(/\n/g,"<br>") + "</p>";
+}
+function showAlert(kind,msg){ $("alert").innerHTML = `<div class="alert ${kind}"><span>${kind==='err'?'⚠':'ⓘ'}</span><span>${esc(msg)}</span></div>`; }
+function clearAlert(){ $("alert").innerHTML = ""; }
+
+function renderKpis(profile, holds){
+  const eq = holds.reduce((s,h)=> s + (isEquity(h.asset_class)? Number(h.weight_pct)||0 : 0), 0);
+  const bd = holds.reduce((s,h)=> s + (isBond(h.asset_class)?   Number(h.weight_pct)||0 : 0), 0);
+  const cap = profile && profile.capital != null ? `${Number(profile.capital).toLocaleString()} <small>${esc(profile.currency||"")}</small>` : "—";
+  const cards = [
+    {k:"Capital", v:cap, c:"#e7b568"},
+    {k:"Equity", v:`${+eq.toFixed(1)}<small>%</small>`, c:"#35d6a4"},
+    {k:"Fixed income", v:`${+bd.toFixed(1)}<small>%</small>`, c:"#4ea9ff"},
+    {k:"Holdings", v:`${holds.length}`, c:"#a78bfa"},
+  ];
+  $("kpis").innerHTML = cards.map(c =>
+    `<div class="kpi" style="--kc:${c.c}"><div class="k">${c.k}</div><div class="v">${c.v}</div></div>`
+  ).join("");
+}
+
+function renderProfile(p){
+  const g = $("profileGrid"); g.innerHTML="";
+  if(!p) return false;
+  const rows = [
+    ["Capital", p.capital!=null ? `${Number(p.capital).toLocaleString()} ${p.currency||""}` : "—"],
+    ["Time horizon", p.time_horizon || "—"],
+    ["Risk tolerance", p.risk_tolerance || "—"],
+    ["Goals", p.goals || "—"],
+    ["Constraints", p.constraints || "—"],
+    ["Assumptions", p.assumptions || "—"],
+  ];
+  if(p.min_holdings) rows.push(["Min holdings", p.min_holdings]);
+  if(p.max_holdings) rows.push(["Max holdings", p.max_holdings]);
+  rows.forEach(([k,v])=>{
+    const d=document.createElement("div"); d.className="kv";
+    d.innerHTML=`<div class="k">${esc(k)}</div><div class="v">${esc(v)}</div>`; g.appendChild(d);
+  });
+  return true;
+}
+
+function renderAllocation(a){
+  const has = a && Array.isArray(a.holdings) && a.holdings.length>0;
+  $("kpis").style.display = has ? "" : "none";
+  if(!has){ $("allocCount").textContent=""; return false; }
+  const holds = a.holdings;
+  renderKpis(window.__profile, holds);
+  $("allocCount").textContent = holds.length;
+
+  // donut
+  let acc=0;
+  const stops = holds.map((h,i)=>{ const s=acc; acc+=Number(h.weight_pct)||0; return `${COLORS[i%COLORS.length]} ${s}% ${acc}%`; });
+  $("donut").style.background = `conic-gradient(${stops.join(", ")})`;
+  const top = holds.slice().sort((x,y)=>(y.weight_pct)-(x.weight_pct))[0];
+  $("donutCenter").innerHTML = `<div><div class="big num">${+Number(top.weight_pct).toFixed(0)}%</div><div class="lab">${esc((top.ticker||top.asset_class))}</div></div>`;
+
+  // legend
+  const leg=$("legend"); leg.innerHTML="";
+  holds.forEach((h,i)=>{
+    const r=document.createElement("div"); r.className="legrow";
+    r.innerHTML=`<span class="swatch" style="background:${COLORS[i%COLORS.length]}"></span><span class="name">${esc(h.asset)}</span><span class="pct">${Number(h.weight_pct)}%</span>`;
+    leg.appendChild(r);
+  });
+
+  // table
+  const tb=$("allocTable").querySelector("tbody"); tb.innerHTML="";
+  holds.forEach((h,i)=>{
+    const w=Number(h.weight_pct)||0; const tr=document.createElement("tr");
+    tr.innerHTML=
+      `<td><strong>${esc(h.asset)}</strong></td>`+
+      `<td><span class="tick">${esc(h.ticker)||"—"}</span></td>`+
+      `<td>${esc(h.asset_class)}</td>`+
+      `<td><span class="wpct">${w}%</span>`+
+      `<div class="bar" style="width:${Math.min(w,100)}%;background:${COLORS[i%COLORS.length]}"></div>`+
+      `<div class="rat">${esc(h.rationale)}</div></td>`;
+    tb.appendChild(tr);
+  });
+  return true;
+}
+
+function renderRisk(a){
+  const parts=[];
+  if(a && a.suitability_note) parts.push(`<div class="note gold"><b>Suitability</b> — ${esc(a.suitability_note)}</div>`);
+  if(a && a.risk_assessment)  parts.push(`<div class="note"><b>Risk</b> — ${esc(a.risk_assessment)}</div>`);
+  $("riskBody").innerHTML = parts.join("");
+  return parts.length>0;
+}
+
+// --- section selector (tabs) ---------------------------------------------------
+function activateTab(name){
+  document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=> p.classList.toggle('active', p.id==='panel-'+name));
+}
+function setupTabs(avail){
+  let first=null;
+  ['alloc','risk','profile','report'].forEach(name=>{
+    const tab=document.querySelector(`.tab[data-tab="${name}"]`);
+    const has=!!avail[name]; tab.hidden=!has;
+    if(has && first===null) first=name;
+  });
+  if(first) activateTab(first);
+}
+$("tabs").addEventListener('click', e=>{ const b=e.target.closest('.tab'); if(b && !b.hidden) activateTab(b.dataset.tab); });
+
+async function submit(){
+  const request=$("req").value.trim();
+  if(!request){ showAlert("warn","Please describe your mandate first."); return; }
+  clearAlert(); $("results").classList.remove("on");
+  $("go").disabled=true; $("idleHint").style.display="none"; $("loading").classList.add("on");
+  const t0=Date.now();
+  const timer=setInterval(()=>{ const s=Math.floor((Date.now()-t0)/1000);
+    $("loadingText").textContent=`The desk is deliberating… ${s}s elapsed (usually 1–3 minutes).`; },1000);
+  try{
+    const res=await fetch("/advise",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({request})});
+    if(!res.ok){ let d=`${res.status} ${res.statusText}`; try{const j=await res.json(); if(j.detail)d=j.detail;}catch(_){}; throw new Error(d); }
+    const data=await res.json();
+    if((data.final_proposal||"").includes(ABORT_MARKER))
+      showAlert("err","The system hit a temporary error while building the proposal. Please try again in a moment.");
+    window.__profile = data.investor_profile;
+    const hasAlloc   = renderAllocation(data.allocation);
+    const hasRisk    = renderRisk(data.allocation);
+    const hasProfile = renderProfile(data.investor_profile);
+    $("proposal").innerHTML=renderMarkdown(data.final_proposal||"_(no proposal returned)_");
+    const secs=Math.round((Date.now()-t0)/1000);
+    $("meta").innerHTML=`<span>Revisions <span class="num">${data.revision_count??0}</span></span>`+
+      `<span>Generated in <span class="num">${secs}s</span></span>`+
+      `<span>Run <span class="num">${esc(data.thread_id||"")}</span></span>`;
+    setupTabs({alloc:hasAlloc, risk:hasRisk, profile:hasProfile, report:true});
+    $("results").classList.add("on");
+    $("results").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(err){ showAlert("err","Request failed: "+err.message); }
+  finally{ clearInterval(timer); $("loading").classList.remove("on"); $("idleHint").style.display=""; $("go").disabled=false; }
+}
+$("go").addEventListener("click",submit);
+$("req").addEventListener("keydown",(e)=>{ if((e.ctrlKey||e.metaKey)&&e.key==="Enter") submit(); });
+</script>
+</body>
+</html>
